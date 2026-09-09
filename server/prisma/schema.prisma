@@ -13,6 +13,12 @@ enum Role {
   LEARNER
 }
 
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -20,4 +26,40 @@ model User {
   role      Role     @default(LEARNER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  courses   Course[]
+}
+
+model Course {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  category     String
+  status       CourseStatus @default(DRAFT)
+  instructorId String       @map("instructor_id")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  instructor   User         @relation(fields: [instructorId], references: [id])
+  lessons      Lesson[]
+
+  @@index([instructorId])
+  @@index([status])
+  @@map("courses")
+}
+
+model Lesson {
+  id        String   @id @default(uuid())
+  courseId  String   @map("course_id")
+  title     String
+  content   String
+  position  Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, position])
+  @@index([courseId, position])
+  @@map("lessons")
 }
