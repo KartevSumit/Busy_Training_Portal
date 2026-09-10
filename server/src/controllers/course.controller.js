@@ -1,3 +1,5 @@
+const { catalogQuerySchema } = require('../validations/catalog.validation');
+const { getCatalog } = require('../services/catalog.service');
 const prisma = require('../db/prisma');
 const { createCourseSchema, updateCourseSchema } = require('../validations/course.validation');
 const { transitionCourseStatus } = require('../services/courseState.service');
@@ -95,6 +97,16 @@ exports.restoreCourse = async (req, res, next) => {
     const courseId = req.params.id;
     const updatedCourse = await transitionCourseStatus(courseId, 'PUBLISHED', req.user.id);
     res.status(200).json({ course: updatedCourse });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.listCourses = async (req, res, next) => {
+  try {
+    const validatedQuery = catalogQuerySchema.parse(req.query);
+    const result = await getCatalog(validatedQuery, req.user);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }

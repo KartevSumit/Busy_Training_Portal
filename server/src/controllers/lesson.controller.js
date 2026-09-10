@@ -89,11 +89,10 @@ exports.updateLesson = async (req, res, next) => {
 exports.deleteLesson = async (req, res, next) => {
   try {
     const lessonId = req.params.id;
-    
+
     const targetLesson = await getOwnedLesson(lessonId, req.user.id);
     const courseId = targetLesson.courseId;
 
-    // Delete and repair positions transactionally
     await prisma.$transaction(async (tx) => {
       await tx.lesson.delete({
         where: { id: lessonId },
@@ -104,8 +103,6 @@ exports.deleteLesson = async (req, res, next) => {
         orderBy: { position: 'asc' },
       });
 
-      // Simple repair strategy: Just update sequentially (won't conflict since we only close gaps)
-      // Since we deleted an item, positions can only decrease, so no unique constraint violations.
       for (let i = 0; i < remainingLessons.length; i++) {
         const lesson = remainingLessons[i];
         if (lesson.position !== i) {
@@ -129,7 +126,7 @@ exports.reorderLesson = async (req, res, next) => {
     const { newPosition } = reorderLessonSchema.parse(req.body);
 
     const updatedLessons = await reorderLesson(lessonId, newPosition, req.user.id);
-    
+
     res.status(200).json({ lessons: updatedLessons });
   } catch (error) {
     next(error);
