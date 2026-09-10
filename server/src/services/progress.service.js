@@ -59,7 +59,7 @@ const markLessonComplete = async (enrollmentId, lessonId) => {
       newStatus = 'COMPLETED';
     }
 
-    if (enrollment.status !== newStatus) {
+    if (enrollment.status !== newStatus || progressCreated) {
       return await tx.enrollment.update({
         where: { id: enrollmentId },
         data: {

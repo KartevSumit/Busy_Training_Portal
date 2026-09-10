@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -25,7 +25,9 @@
     "zod": "^4.6.0"
   },
   "devDependencies": {
+    "jest": "^30.5.1",
     "nodemon": "^3.1.14",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "supertest": "^7.2.2"
   }
 }

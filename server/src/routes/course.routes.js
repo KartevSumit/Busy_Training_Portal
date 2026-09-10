@@ -29,6 +29,7 @@ router.get('/:id', getCourse);
 router.patch('/:id', requireRole('INSTRUCTOR'), updateCourse);
 
 router.get('/:id/activity', requireRole('INSTRUCTOR'), getCourseActivity);
+router.post('/:id/alerts/:learnerId/dismiss', requireRole('INSTRUCTOR'), require('../controllers/alert.controller').dismissAlert);
 
 router.post('/:id/publish', requireRole('INSTRUCTOR'), publishCourse);
 router.post('/:id/archive', requireRole('INSTRUCTOR'), archiveCourse);

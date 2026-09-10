@@ -33,9 +33,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  courses     Course[]
-  enrollments Enrollment[]
-  ActivityLog ActivityLog[]
+  courses        Course[]
+  enrollments    Enrollment[]
+  ActivityLog    ActivityLog[]
+  AlertDismissal AlertDismissal[]
 }
 
 model Course {
@@ -48,10 +49,11 @@ model Course {
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
-  instructor  User          @relation(fields: [instructorId], references: [id])
-  lessons     Lesson[]
-  enrollments Enrollment[]
-  ActivityLog ActivityLog[]
+  instructor     User             @relation(fields: [instructorId], references: [id])
+  lessons        Lesson[]
+  enrollments    Enrollment[]
+  ActivityLog    ActivityLog[]
+  AlertDismissal AlertDismissal[]
 
   @@index([instructorId])
   @@index([status])
@@ -132,4 +134,20 @@ model ActivityLog {
   @@index([courseId, createdAt(sort: Desc)])
   @@index([actorId])
   @@map("activity_log")
+}
+
+model AlertDismissal {
+  id           String   @id @default(uuid())
+  learnerId    String   @map("learner_id")
+  courseId     String   @map("course_id")
+  episodeStart DateTime @map("episode_start")
+  dismissedAt  DateTime @default(now()) @map("dismissed_at")
+
+  learner User   @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([learnerId, courseId, episodeStart])
+  @@index([courseId, episodeStart])
+  @@index([learnerId, episodeStart])
+  @@map("alert_dismissals")
 }
