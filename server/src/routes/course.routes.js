@@ -11,6 +11,10 @@ const {
   createLesson,
   getCourseLessons
 } = require('../controllers/lesson.controller');
+const {
+  enroll,
+  bulkEnroll
+} = require('../controllers/enrollment.controller');
 const { authenticateToken, requireRole } = require('../middleware/auth.middleware');
 
 const router = express.Router();
@@ -29,5 +33,9 @@ router.post('/:id/restore', requireRole('INSTRUCTOR'), restoreCourse);
 // Nested Lesson endpoints within Course
 router.post('/:id/lessons', requireRole('INSTRUCTOR'), createLesson);
 router.get('/:id/lessons', getCourseLessons);
+
+// Enrollment endpoints
+router.post('/:id/enroll', enroll);
+router.post('/:id/enroll-bulk', requireRole('INSTRUCTOR'), bulkEnroll);
 
 module.exports = router;

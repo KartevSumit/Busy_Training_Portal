@@ -4,6 +4,8 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth.routes');
 const courseRoutes = require('./routes/course.routes');
 const lessonRoutes = require('./routes/lesson.routes');
+const enrollmentRoutes = require('./routes/enrollment.routes');
+const progressRoutes = require('./routes/progress.routes');
 const errorHandler = require('./middleware/error.middleware');
 
 const app = express();
@@ -16,6 +18,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
+app.use('/api/me/enrollments', enrollmentRoutes);
+app.use('/api/lessons', progressRoutes);
 
 // Error handler
 app.use(errorHandler);

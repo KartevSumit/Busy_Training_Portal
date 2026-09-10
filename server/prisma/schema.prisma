@@ -19,6 +19,12 @@ enum CourseStatus {
   ARCHIVED
 }
 
+enum EnrollmentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -27,7 +33,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  courses   Course[]
+  courses     Course[]
+  enrollments Enrollment[]
 }
 
 model Course {
@@ -42,6 +49,7 @@ model Course {
 
   instructor   User         @relation(fields: [instructorId], references: [id])
   lessons      Lesson[]
+  enrollments  Enrollment[]
 
   @@index([instructorId])
   @@index([status])
@@ -58,8 +66,43 @@ model Lesson {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress  LessonProgress[]
 
   @@unique([courseId, position])
   @@index([courseId, position])
   @@map("lessons")
+}
+
+model Enrollment {
+  id              String           @id @default(uuid())
+  learnerId       String           @map("learner_id")
+  courseId        String           @map("course_id")
+  status          EnrollmentStatus @default(NOT_STARTED)
+  enrolledAt      DateTime         @default(now()) @map("enrolled_at")
+  statusChangedAt DateTime         @default(now()) @map("status_changed_at")
+
+  learner         User             @relation(fields: [learnerId], references: [id])
+  course          Course           @relation(fields: [courseId], references: [id])
+  lessonProgress  LessonProgress[]
+
+  @@unique([learnerId, courseId])
+  @@index([learnerId])
+  @@index([courseId])
+  @@index([status])
+  @@map("enrollments")
+}
+
+model LessonProgress {
+  id           String     @id @default(uuid())
+  enrollmentId String     @map("enrollment_id")
+  lessonId     String     @map("lesson_id")
+  completedAt  DateTime   @default(now()) @map("completed_at")
+
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson       Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, lessonId])
+  @@index([enrollmentId])
+  @@index([lessonId])
+  @@map("lesson_progress")
 }
