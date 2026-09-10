@@ -4,21 +4,14 @@ const prisma = require('../db/prisma');
 const { createCourseSchema, updateCourseSchema } = require('../validations/course.validation');
 const { transitionCourseStatus } = require('../services/courseState.service');
 const { getOwnedCourse } = require('../services/ownership.service');
+const courseService = require('../services/course.service');
 const AppError = require('../utils/AppError');
 
 exports.createCourse = async (req, res, next) => {
   try {
-    const { title, description, category } = createCourseSchema.parse(req.body);
+    const data = createCourseSchema.parse(req.body);
 
-    const course = await prisma.course.create({
-      data: {
-        title,
-        description,
-        category,
-        status: 'DRAFT',
-        instructorId: req.user.id,
-      },
-    });
+    const course = await courseService.createCourse(data, req.user.id);
 
     res.status(201).json({ course });
   } catch (error) {
@@ -39,7 +32,6 @@ exports.getCourse = async (req, res, next) => {
 
     if (req.user.role === 'LEARNER') {
       if (course.status !== 'PUBLISHED') {
-        // Prevent learner from distinguishing between non-existent vs draft/archived
         throw new AppError(404, 'COURSE_NOT_FOUND', 'Course not found');
       }
     } else if (req.user.role === 'INSTRUCTOR') {
@@ -57,14 +49,9 @@ exports.getCourse = async (req, res, next) => {
 exports.updateCourse = async (req, res, next) => {
   try {
     const courseId = req.params.id;
-    const { title, description, category } = updateCourseSchema.parse(req.body);
+    const data = updateCourseSchema.parse(req.body);
 
-    await getOwnedCourse(courseId, req.user.id);
-
-    const updatedCourse = await prisma.course.update({
-      where: { id: courseId },
-      data: { title, description, category },
-    });
+    const updatedCourse = await courseService.updateCourse(courseId, data, req.user.id);
 
     res.status(200).json({ course: updatedCourse });
   } catch (error) {

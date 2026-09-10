@@ -35,6 +35,7 @@ model User {
 
   courses     Course[]
   enrollments Enrollment[]
+  ActivityLog ActivityLog[]
 }
 
 model Course {
@@ -47,9 +48,10 @@ model Course {
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
-  instructor   User         @relation(fields: [instructorId], references: [id])
-  lessons      Lesson[]
-  enrollments  Enrollment[]
+  instructor  User          @relation(fields: [instructorId], references: [id])
+  lessons     Lesson[]
+  enrollments Enrollment[]
+  ActivityLog ActivityLog[]
 
   @@index([instructorId])
   @@index([status])
@@ -65,8 +67,8 @@ model Lesson {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  progress  LessonProgress[]
+  course   Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
 
   @@unique([courseId, position])
   @@index([courseId, position])
@@ -81,9 +83,9 @@ model Enrollment {
   enrolledAt      DateTime         @default(now()) @map("enrolled_at")
   statusChangedAt DateTime         @default(now()) @map("status_changed_at")
 
-  learner         User             @relation(fields: [learnerId], references: [id])
-  course          Course           @relation(fields: [courseId], references: [id])
-  lessonProgress  LessonProgress[]
+  learner        User             @relation(fields: [learnerId], references: [id])
+  course         Course           @relation(fields: [courseId], references: [id])
+  lessonProgress LessonProgress[]
 
   @@unique([learnerId, courseId])
   @@index([learnerId])
@@ -93,16 +95,41 @@ model Enrollment {
 }
 
 model LessonProgress {
-  id           String     @id @default(uuid())
-  enrollmentId String     @map("enrollment_id")
-  lessonId     String     @map("lesson_id")
-  completedAt  DateTime   @default(now()) @map("completed_at")
+  id           String   @id @default(uuid())
+  enrollmentId String   @map("enrollment_id")
+  lessonId     String   @map("lesson_id")
+  completedAt  DateTime @default(now()) @map("completed_at")
 
-  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  lesson       Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson     Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([enrollmentId, lessonId])
   @@index([enrollmentId])
   @@index([lessonId])
   @@map("lesson_progress")
+}
+
+enum ActivityActionType {
+  COURSE_CREATED
+  COURSE_UPDATED
+  COURSE_PUBLISHED
+  COURSE_ARCHIVED
+  COURSE_RESTORED
+  COMMENT_ADDED
+}
+
+model ActivityLog {
+  id         String             @id @default(uuid())
+  courseId   String             @map("course_id")
+  actorId    String             @map("actor_id")
+  actionType ActivityActionType @map("action_type")
+  detail     Json
+  createdAt  DateTime           @default(now()) @map("created_at")
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  actor  User   @relation(fields: [actorId], references: [id])
+
+  @@index([courseId, createdAt(sort: Desc)])
+  @@index([actorId])
+  @@map("activity_log")
 }

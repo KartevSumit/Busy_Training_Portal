@@ -31,7 +31,6 @@ const transitionCourseStatus = async (courseId, newStatus, instructorId) => {
     throw new AppError(409, 'ILLEGAL_STATE_TRANSITION', `Cannot transition from ${currentStatus} to ${newStatus}`);
   }
 
-  // Publish gate logic
   if (newStatus === 'PUBLISHED') {
     const lessonCount = await prisma.lesson.count({
       where: { courseId },
@@ -42,9 +41,27 @@ const transitionCourseStatus = async (courseId, newStatus, instructorId) => {
     }
   }
 
-  const updatedCourse = await prisma.course.update({
-    where: { id: courseId },
-    data: { status: newStatus },
+  const updatedCourse = await prisma.$transaction(async (tx) => {
+    const updated = await tx.course.update({
+      where: { id: courseId },
+      data: { status: newStatus },
+    });
+
+    await require('./activityLog.service').recordActivity(tx, {
+      courseId,
+      actorId: instructorId,
+      actionType: newStatus === 'PUBLISHED' && currentStatus === 'ARCHIVED' 
+        ? 'COURSE_RESTORED' 
+        : newStatus === 'PUBLISHED' 
+          ? 'COURSE_PUBLISHED' 
+          : 'COURSE_ARCHIVED',
+      detail: {
+        previousStatus: currentStatus,
+        newStatus: newStatus
+      }
+    });
+
+    return updated;
   });
 
   return updatedCourse;

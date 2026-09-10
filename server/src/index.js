@@ -14,14 +14,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/me/enrollments', enrollmentRoutes);
 app.use('/api/lessons', progressRoutes);
 
-// Error handler
 app.use(errorHandler);
 
 app.listen(PORT, () => {

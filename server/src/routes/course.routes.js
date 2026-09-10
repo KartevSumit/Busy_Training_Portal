@@ -17,6 +17,7 @@ const {
   bulkEnroll
 } = require('../controllers/enrollment.controller');
 const { authenticateToken, requireRole } = require('../middleware/auth.middleware');
+const { getCourseActivity } = require('../controllers/activityLog.controller');
 
 const router = express.Router();
 
@@ -26,6 +27,8 @@ router.post('/', requireRole('INSTRUCTOR'), createCourse);
 router.get('/', listCourses);
 router.get('/:id', getCourse);
 router.patch('/:id', requireRole('INSTRUCTOR'), updateCourse);
+
+router.get('/:id/activity', requireRole('INSTRUCTOR'), getCourseActivity);
 
 router.post('/:id/publish', requireRole('INSTRUCTOR'), publishCourse);
 router.post('/:id/archive', requireRole('INSTRUCTOR'), archiveCourse);

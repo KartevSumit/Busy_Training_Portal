@@ -17,7 +17,6 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-    // Public registration only creates LEARNER accounts
     const user = await prisma.user.create({
       data: {
         email,

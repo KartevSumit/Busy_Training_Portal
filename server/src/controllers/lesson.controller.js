@@ -11,7 +11,6 @@ exports.createLesson = async (req, res, next) => {
 
     await getOwnedCourse(courseId, req.user.id);
 
-    // Calculate position inside transaction to avoid race conditions
     const lesson = await prisma.$transaction(async (tx) => {
       const agg = await tx.lesson.aggregate({
         where: { courseId },
