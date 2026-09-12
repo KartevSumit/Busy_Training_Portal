@@ -82,7 +82,14 @@ exports.getMyEnrollments = async (req, res, next) => {
     const { id: learnerId } = req.user;
 
     const enrollments = await prisma.enrollment.findMany({
-      where: { learnerId },
+      where: { 
+        learnerId,
+        course: {
+          status: {
+            not: 'DRAFT'
+          }
+        }
+      },
       include: {
         course: {
           select: {

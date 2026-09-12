@@ -8,26 +8,12 @@ exports.createLesson = async (req, res, next) => {
   try {
     const courseId = req.params.id;
     const { title, content } = createLessonSchema.parse(req.body);
-
     await getOwnedCourse(courseId, req.user.id);
-
     const lesson = await prisma.$transaction(async (tx) => {
-      const agg = await tx.lesson.aggregate({
-        where: { courseId },
-        _max: { position: true },
-      });
+      const agg = await tx.lesson.aggregate({ where: { courseId }, _max: { position: true } });
       const nextPosition = agg._max.position !== null ? agg._max.position + 1 : 0;
-
-      return tx.lesson.create({
-        data: {
-          title,
-          content,
-          position: nextPosition,
-          courseId,
-        },
-      });
+      return tx.lesson.create({ data: { title, content, position: nextPosition, courseId } });
     });
-
     res.status(201).json({ lesson });
   } catch (error) {
     next(error);
@@ -46,8 +32,19 @@ exports.getCourseLessons = async (req, res, next) => {
       throw new AppError(404, 'COURSE_NOT_FOUND', 'Course not found');
     }
 
+    let isEnrolled = false;
+
     if (req.user.role === 'LEARNER') {
-      if (course.status !== 'PUBLISHED') {
+      if (course.status === 'DRAFT') {
+        throw new AppError(404, 'COURSE_NOT_FOUND', 'Course not found');
+      }
+
+      const enrollment = await prisma.enrollment.findUnique({
+        where: { learnerId_courseId: { learnerId: req.user.id, courseId } }
+      });
+      isEnrolled = !!enrollment;
+      
+      if (!isEnrolled && course.status === 'ARCHIVED') {
         throw new AppError(404, 'COURSE_NOT_FOUND', 'Course not found');
       }
     } else if (req.user.role === 'INSTRUCTOR') {
@@ -56,10 +53,35 @@ exports.getCourseLessons = async (req, res, next) => {
       }
     }
 
-    const lessons = await prisma.lesson.findMany({
+    const lessonsArgs = {
       where: { courseId },
-      orderBy: { position: 'asc' },
-    });
+      orderBy: { position: 'asc' }
+    };
+
+    if (req.user.role === 'LEARNER' && isEnrolled) {
+      lessonsArgs.include = {
+        progress: {
+          where: { enrollment: { learnerId: req.user.id } },
+          select: { completedAt: true }
+        }
+      };
+    }
+
+    const lessonsData = await prisma.lesson.findMany(lessonsArgs);
+
+    let lessons = lessonsData;
+    if (req.user.role === 'LEARNER' && isEnrolled) {
+      lessons = lessonsData.map(l => ({
+        id: l.id,
+        courseId: l.courseId,
+        title: l.title,
+        content: l.content,
+        position: l.position,
+        createdAt: l.createdAt,
+        updatedAt: l.updatedAt,
+        isCompleted: Array.isArray(l.progress) && l.progress.length > 0
+      }));
+    }
 
     res.status(200).json({ lessons });
   } catch (error) {
@@ -71,14 +93,8 @@ exports.updateLesson = async (req, res, next) => {
   try {
     const lessonId = req.params.id;
     const { title, content } = updateLessonSchema.parse(req.body);
-
     await getOwnedLesson(lessonId, req.user.id);
-
-    const updatedLesson = await prisma.lesson.update({
-      where: { id: lessonId },
-      data: { title, content },
-    });
-
+    const updatedLesson = await prisma.lesson.update({ where: { id: lessonId }, data: { title, content } });
     res.status(200).json({ lesson: updatedLesson });
   } catch (error) {
     next(error);
@@ -88,31 +104,18 @@ exports.updateLesson = async (req, res, next) => {
 exports.deleteLesson = async (req, res, next) => {
   try {
     const lessonId = req.params.id;
-
     const targetLesson = await getOwnedLesson(lessonId, req.user.id);
     const courseId = targetLesson.courseId;
-
     await prisma.$transaction(async (tx) => {
-      await tx.lesson.delete({
-        where: { id: lessonId },
-      });
-
-      const remainingLessons = await tx.lesson.findMany({
-        where: { courseId },
-        orderBy: { position: 'asc' },
-      });
-
+      await tx.lesson.delete({ where: { id: lessonId } });
+      const remainingLessons = await tx.lesson.findMany({ where: { courseId }, orderBy: { position: 'asc' } });
       for (let i = 0; i < remainingLessons.length; i++) {
         const lesson = remainingLessons[i];
         if (lesson.position !== i) {
-          await tx.lesson.update({
-            where: { id: lesson.id },
-            data: { position: i },
-          });
+          await tx.lesson.update({ where: { id: lesson.id }, data: { position: i } });
         }
       }
     });
-
     res.status(204).send();
   } catch (error) {
     next(error);
@@ -123,9 +126,7 @@ exports.reorderLesson = async (req, res, next) => {
   try {
     const lessonId = req.params.id;
     const { newPosition } = reorderLessonSchema.parse(req.body);
-
     const updatedLessons = await reorderLesson(lessonId, newPosition, req.user.id);
-
     res.status(200).json({ lessons: updatedLessons });
   } catch (error) {
     next(error);
