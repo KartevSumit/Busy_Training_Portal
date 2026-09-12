@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AdminDashboard from './pages/AdminDashboard';
 import Catalog from './pages/Catalog';
+import CourseDetail from './pages/CourseDetail';
+import MyCourses from './pages/MyCourses';
 
 const Placeholder = ({ title }) => (
   <div className="bg-white shadow rounded-lg p-6 text-center mt-8 max-w-2xl mx-auto">
@@ -31,12 +33,20 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/courses/:id" 
+              element={
+                <ProtectedRoute allowedRoles={['INSTRUCTOR', 'LEARNER']}>
+                  <CourseDetail />
+                </ProtectedRoute>
+              } 
+            />
             
             <Route 
               path="/my-courses" 
               element={
-                <ProtectedRoute allowedRoles={['LEARNER']}>
-                  <Placeholder title="My Courses" />
+                <ProtectedRoute allowedRoles={['INSTRUCTOR', 'LEARNER']}>
+                  <MyCourses />
                 </ProtectedRoute>
               } 
             />

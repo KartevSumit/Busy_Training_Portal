@@ -90,3 +90,50 @@ export const api = {
   patch: (endpoint, body, options = {}) => request(endpoint, { ...options, method: 'PATCH', body }),
   delete: (endpoint, options = {}) => request(endpoint, { ...options, method: 'DELETE' }),
 };
+
+export async function downloadCsv(endpoint, defaultFilename = 'download.csv') {
+  const url = `${API_URL}${endpoint}`;
+  const token = localStorage.getItem('auth_token');
+  
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    }
+  });
+
+  if (!response.ok) {
+    let message = `Export failed (HTTP ${response.status})`;
+    try {
+      const text = await response.text();
+      const data = JSON.parse(text);
+      if (data?.error?.message) message = data.error.message;
+      else if (data?.message) message = data.message;
+    } catch (e) {
+    }
+    throw new ApiError(message, response.status);
+  }
+
+  let filename = defaultFilename;
+  const contentDisposition = response.headers.get('Content-Disposition');
+  if (contentDisposition && contentDisposition.includes('filename=')) {
+    const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+    if (filenameMatch && filenameMatch.length === 2) {
+      filename = filenameMatch[1];
+    }
+  }
+
+  const blob = await response.blob();
+  const objectUrl = window.URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = objectUrl;
+  a.download = filename;
+  
+  document.body.appendChild(a);
+  a.click();
+  
+  window.URL.revokeObjectURL(objectUrl);
+  document.body.removeChild(a);
+}

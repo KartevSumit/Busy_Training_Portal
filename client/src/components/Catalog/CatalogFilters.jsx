@@ -20,14 +20,11 @@ export default function CatalogFilters({
 
   const handleClearSearch = () => {
     onFilterChange({ q: '' });
-    // We optionally submit immediately, or just let user click search.
-    // Given the prompt "clear/search affordance", let's let the parent handle the submit if we want.
   };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
-      
-      {/* Search Bar */}
+
       <div className="flex-1 relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <Search className="h-5 w-5 text-gray-400" />
@@ -65,7 +62,6 @@ export default function CatalogFilters({
         </button>
       </div>
 
-      {/* Category Filter */}
       <div className="sm:w-48">
         <select
           name="category"
@@ -81,11 +77,9 @@ export default function CatalogFilters({
           <option value="Business">Business</option>
           <option value="Design">Design</option>
           <option value="Health">Health</option>
-          {/* Add more as needed, or dynamically load them. For now simple static list or just free text is enough, backend allows any string. */}
         </select>
       </div>
 
-      {/* Status Filter (Instructor Only) */}
       {role === 'INSTRUCTOR' && (
         <>
           <div className="sm:w-40">
@@ -104,7 +98,7 @@ export default function CatalogFilters({
               <option value="ARCHIVED">Archived</option>
             </select>
           </div>
-          
+
           <div className="sm:w-48">
             <input
               type="text"
@@ -120,7 +114,6 @@ export default function CatalogFilters({
         </>
       )}
 
-      {/* Sort Options */}
       <div className="sm:w-48">
         <select
           name="sort"

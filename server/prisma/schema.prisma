@@ -37,6 +37,7 @@ model User {
   enrollments    Enrollment[]
   ActivityLog    ActivityLog[]
   AlertDismissal AlertDismissal[]
+  comments       Comment[]
 }
 
 model Course {
@@ -54,6 +55,7 @@ model Course {
   enrollments    Enrollment[]
   ActivityLog    ActivityLog[]
   AlertDismissal AlertDismissal[]
+  comments       Comment[]
 
   @@index([instructorId])
   @@index([status])
@@ -150,4 +152,19 @@ model AlertDismissal {
   @@index([courseId, episodeStart])
   @@index([learnerId, episodeStart])
   @@map("alert_dismissals")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  courseId  String   @map("course_id")
+  authorId  String   @map("author_id")
+  text      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([courseId, createdAt(sort: Desc)])
+  @@map("comments")
 }

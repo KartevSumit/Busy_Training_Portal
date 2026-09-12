@@ -17,7 +17,7 @@ const {
   bulkEnroll
 } = require('../controllers/enrollment.controller');
 const { authenticateToken, requireRole } = require('../middleware/auth.middleware');
-const { getCourseActivity } = require('../controllers/activityLog.controller');
+const { getCourseActivity, addComment } = require('../controllers/activityLog.controller');
 
 const router = express.Router();
 
@@ -29,6 +29,7 @@ router.get('/:id', getCourse);
 router.patch('/:id', requireRole('INSTRUCTOR'), updateCourse);
 
 router.get('/:id/activity', requireRole('INSTRUCTOR'), getCourseActivity);
+router.post('/:id/comments', addComment);
 router.get('/:id/progress-export.csv', requireRole('INSTRUCTOR'), require('../controllers/export.controller').exportCourseProgress);
 router.post('/:id/alerts/:learnerId/dismiss', requireRole('INSTRUCTOR'), require('../controllers/alert.controller').dismissAlert);
 

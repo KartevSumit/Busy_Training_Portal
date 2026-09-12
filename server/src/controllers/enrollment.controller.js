@@ -91,6 +91,7 @@ exports.getMyEnrollments = async (req, res, next) => {
             description: true,
             category: true,
             instructorId: true,
+            status: true,
           }
         }
       }

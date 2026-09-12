@@ -34,20 +34,18 @@ const reorderLesson = async (lessonId, newPosition, instructorId) => {
   const transactionOps = [];
 
   for (let i = 0; i < allLessons.length; i++) {
-    const lesson = allLessons[i];
     transactionOps.push(
       prisma.lesson.update({
-        where: { id: lesson.id },
-        data: { position: lesson.position + LESSON_POSITION_OFFSET },
+        where: { id: allLessons[i].id },
+        data: { position: allLessons[i].position + LESSON_POSITION_OFFSET },
       })
     );
   }
 
   for (let i = 0; i < allLessons.length; i++) {
-    const lesson = allLessons[i];
     transactionOps.push(
       prisma.lesson.update({
-        where: { id: lesson.id },
+        where: { id: allLessons[i].id },
         data: { position: i },
       })
     );

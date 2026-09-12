@@ -28,6 +28,9 @@ export default function AppShell() {
                     <Link to="/catalog" className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2">
                       <BookOpen className="h-4 w-4" /> Catalog
                     </Link>
+                    <Link to="/my-courses" className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4" /> My Courses
+                    </Link>
                     <Link to="/dashboard" className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2">
                       <LayoutDashboard className="h-4 w-4" /> Dashboard
                     </Link>
