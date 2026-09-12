@@ -57,6 +57,8 @@ export const AuthProvider = ({ children }) => {
     await login(email, password);
   };
 
+  const [alertCount, setAlertCount] = useState(0);
+
   const value = {
     user,
     token,
@@ -64,7 +66,9 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     login,
     signup,
-    logout
+    logout,
+    alertCount,
+    setAlertCount
   };
 
   return (

@@ -89,7 +89,7 @@ describe('T8 Inactivity Alerts', () => {
     expect(res.body.data).toHaveLength(0);
 
     await dismissAlert(tokenA, courseA.id, learner.id).expect(200);
-    const dismissals = await prisma.alertDismissal.findMany();
+    const dismissals = await prisma.alertDismissal.findMany({ where: { learnerId: learner.id, courseId: courseA.id } });
     expect(dismissals).toHaveLength(1);
   });
 

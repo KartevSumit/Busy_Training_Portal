@@ -1,10 +1,24 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogOut, BookOpen, GraduationCap, LayoutDashboard, Bell, Shield } from 'lucide-react';
+import { useEffect } from 'react';
+import { api } from '../lib/apiClient';
 
 export default function AppShell() {
-  const { user, logout } = useAuth();
+  const { user, logout, alertCount, setAlertCount } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.role === 'INSTRUCTOR') {
+      api.get('/alerts/count')
+        .then(res => {
+          if (res && typeof res.count === 'number') {
+            setAlertCount(res.count);
+          }
+        })
+        .catch(err => console.error('Failed to load alert count', err));
+    }
+  }, [user, setAlertCount]);
 
   const handleLogout = () => {
     logout();
@@ -34,8 +48,13 @@ export default function AppShell() {
                     <Link to="/dashboard" className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2">
                       <LayoutDashboard className="h-4 w-4" /> Dashboard
                     </Link>
-                    <Link to="/alerts" className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2">
+                    <Link to="/alerts" className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 relative">
                       <Bell className="h-4 w-4" /> Alerts
+                      {alertCount > 0 && (
+                        <span className="absolute top-1 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                          {alertCount}
+                        </span>
+                      )}
                     </Link>
                   </>
                 )}

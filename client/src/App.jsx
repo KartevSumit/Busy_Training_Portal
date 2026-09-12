@@ -8,6 +8,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import Catalog from './pages/Catalog';
 import CourseDetail from './pages/CourseDetail';
 import MyCourses from './pages/MyCourses';
+import InstructorDashboard from './pages/InstructorDashboard';
+import InstructorAlerts from './pages/InstructorAlerts';
 
 const Placeholder = ({ title }) => (
   <div className="bg-white shadow rounded-lg p-6 text-center mt-8 max-w-2xl mx-auto">
@@ -55,7 +57,7 @@ function App() {
               path="/dashboard" 
               element={
                 <ProtectedRoute allowedRoles={['INSTRUCTOR']}>
-                  <Placeholder title="Instructor Dashboard" />
+                  <InstructorDashboard />
                 </ProtectedRoute>
               } 
             />
@@ -64,7 +66,7 @@ function App() {
               path="/alerts" 
               element={
                 <ProtectedRoute allowedRoles={['INSTRUCTOR']}>
-                  <Placeholder title="Inactivity Alerts" />
+                  <InstructorAlerts />
                 </ProtectedRoute>
               } 
             />
