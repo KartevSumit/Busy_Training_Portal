@@ -5,6 +5,7 @@ import AppShell from './components/AppShell';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AdminDashboard from './pages/AdminDashboard';
+import Catalog from './pages/Catalog';
 
 const Placeholder = ({ title }) => (
   <div className="bg-white shadow rounded-lg p-6 text-center mt-8 max-w-2xl mx-auto">
@@ -26,7 +27,7 @@ function App() {
               path="/catalog" 
               element={
                 <ProtectedRoute allowedRoles={['INSTRUCTOR', 'LEARNER']}>
-                  <Placeholder title="Course Catalog" />
+                  <Catalog />
                 </ProtectedRoute>
               } 
             />

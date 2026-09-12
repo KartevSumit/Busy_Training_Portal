@@ -35,16 +35,30 @@ async function listCourses(filters, sort, page, pageSize) {
 
   const total = await prisma.course.count({ where });
 
+  const includeObj = {
+    _count: {
+      select: { enrollments: true }
+    }
+  };
+
+  if (filters.learnerId) {
+    includeObj.enrollments = {
+      where: {
+        learnerId: filters.learnerId
+      },
+      select: {
+        id: true
+      },
+      take: 1
+    };
+  }
+
   const data = await prisma.course.findMany({
     where,
     skip: (page - 1) * pageSize,
     take: pageSize,
     orderBy: finalOrderBy,
-    include: {
-      _count: {
-        select: { enrollments: true }
-      }
-    }
+    include: includeObj
   });
 
   return { data, total };
