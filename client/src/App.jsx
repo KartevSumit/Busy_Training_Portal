@@ -1,11 +1,17 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AppShell from './components/AppShell';
 import Login from './pages/Login';
-import Register from './pages/Register';
+import Signup from './pages/Signup';
 import AdminDashboard from './pages/AdminDashboard';
-import InstructorDashboard from './pages/InstructorDashboard';
-import LearnerDashboard from './pages/LearnerDashboard';
+
+const Placeholder = ({ title }) => (
+  <div className="bg-white shadow rounded-lg p-6 text-center mt-8 max-w-2xl mx-auto">
+    <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+    <p className="mt-2 text-gray-500">This feature will be implemented in a future task.</p>
+  </div>
+);
 
 function App() {
   return (
@@ -13,36 +19,57 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/signup" element={<Signup />} />
           
-          <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          <Route 
-            path="/instructor" 
-            element={
-              <ProtectedRoute allowedRoles={['INSTRUCTOR']}>
-                <InstructorDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          <Route 
-            path="/learner" 
-            element={
-              <ProtectedRoute allowedRoles={['LEARNER']}>
-                <LearnerDashboard />
-              </ProtectedRoute>
-            } 
-          />
+          <Route element={<AppShell />}>
+            <Route 
+              path="/catalog" 
+              element={
+                <ProtectedRoute allowedRoles={['INSTRUCTOR', 'LEARNER']}>
+                  <Placeholder title="Course Catalog" />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/my-courses" 
+              element={
+                <ProtectedRoute allowedRoles={['LEARNER']}>
+                  <Placeholder title="My Courses" />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute allowedRoles={['INSTRUCTOR']}>
+                  <Placeholder title="Instructor Dashboard" />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/alerts" 
+              element={
+                <ProtectedRoute allowedRoles={['INSTRUCTOR']}>
+                  <Placeholder title="Inactivity Alerts" />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+          </Route>
 
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/catalog" replace />} />
+          <Route path="*" element={<Navigate to="/catalog" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

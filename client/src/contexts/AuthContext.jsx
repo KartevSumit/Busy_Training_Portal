@@ -1,42 +1,83 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { api, setLogoutCallback } from '../lib/apiClient';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem('auth_token') || null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // In a real app, you'd fetch the user profile from API here
-      // to validate the token and get fresh user data.
-      // For this step, we'll extract the payload.
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUser(payload);
-      } catch (e) {
-        localStorage.removeItem('token');
-      }
-    }
-    setLoading(false);
+  const logout = useCallback(() => {
+    localStorage.removeItem('auth_token');
+    setToken(null);
+    setUser(null);
   }, []);
 
-  const login = (token, userData) => {
-    localStorage.setItem('token', token);
-    setUser(userData);
+  useEffect(() => {
+    setLogoutCallback(() => {
+      logout();
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    });
+  }, [logout]);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem('auth_token');
+      if (!storedToken) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const data = await api.get('/auth/me');
+        setUser(data.user);
+      } catch (error) {
+        console.error('Failed to restore session:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  const login = async (email, password) => {
+    const data = await api.post('/auth/login', { email, password });
+    localStorage.setItem('auth_token', data.token);
+    setToken(data.token);
+    setUser(data.user);
+    return data.user;
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
+  const signup = async (email, password) => {
+    await api.post('/auth/register', { email, password });
+    await login(email, password);
+  };
+
+  const value = {
+    user,
+    token,
+    isLoading,
+    isAuthenticated: !!user,
+    login,
+    signup,
+    logout
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {!loading && children}
+    <AuthContext.Provider value={value}>
+      {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

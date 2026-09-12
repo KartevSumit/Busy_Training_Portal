@@ -1,17 +1,16 @@
 import { useState } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogIn } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import PasswordInput from '../components/PasswordInput';
 
-const Login = () => {
+const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { login } = useAuth();
+  const { signup } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,15 +23,8 @@ const Login = () => {
     setIsSubmitting(true);
     
     try {
-      const loggedInUser = await login(email, password);
-      
-      let target = location.state?.from?.pathname || '/catalog';
-      
-      if (loggedInUser?.role === 'ADMIN') {
-        target = '/admin';
-      }
-      
-      navigate(target, { replace: true });
+      await signup(email, password);
+      navigate('/catalog', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -45,11 +37,14 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-sm border border-gray-100">
         <div>
           <div className="mx-auto h-12 w-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center">
-            <LogIn className="h-6 w-6" />
+            <UserPlus className="h-6 w-6" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Create an account
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Join as a learner to explore courses
+          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
@@ -93,13 +88,13 @@ const Login = () => {
               disabled={isSubmitting}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isSubmitting ? 'Signing in...' : 'Sign in'}
+              {isSubmitting ? 'Creating account...' : 'Sign up'}
             </button>
           </div>
           <div className="text-center text-sm">
-            <span className="text-gray-600">Don't have an account? </span>
-            <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign up here
+            <span className="text-gray-600">Already have an account? </span>
+            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Sign in
             </Link>
           </div>
         </form>
@@ -108,4 +103,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
