@@ -44,7 +44,7 @@ export default function InstructorAlerts() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-pulse space-y-6">
+      <div className="w-full animate-pulse space-y-6">
         <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
         {[1,2,3].map(i => <div key={i} className="bg-gray-100 h-24 rounded-lg"></div>)}
       </div>
@@ -53,7 +53,7 @@ export default function InstructorAlerts() {
 
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full">
         <div className="bg-red-50 p-4 rounded-md border border-red-100">
           <div className="flex">
             <AlertTriangle className="h-5 w-5 text-red-400" />
@@ -71,7 +71,7 @@ export default function InstructorAlerts() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="flex flex-col flex-1 space-y-8 w-full">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Inactivity Alerts</h1>
         <p className="mt-1 text-sm text-gray-500">Review learners who have been inactive for more than 14 days.</p>

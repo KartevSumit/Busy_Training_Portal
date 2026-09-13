@@ -65,7 +65,7 @@ export default function MyCoursesInstructor() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="flex flex-col flex-1 space-y-8 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Courses</h1>
@@ -151,7 +151,7 @@ export default function MyCoursesInstructor() {
           </div>
         </div>
       ) : loading && courses.length === 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-6">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-64 bg-gray-100 rounded-xl animate-pulse"></div>
           ))}
@@ -170,20 +170,22 @@ export default function MyCoursesInstructor() {
           </div>
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="flex flex-col flex-1">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-6">
             {courses.map(course => (
               <CourseCard key={course.id} course={course} role="INSTRUCTOR" userId={user.id} />
             ))}
           </div>
           
-          <Pagination
-            page={pagination.page}
-            pageSize={pagination.pageSize}
-            total={pagination.total}
-            totalPages={pagination.totalPages}
-            onPageChange={setPage}
-          />
+          <div className="mt-auto pt-4">
+            <Pagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              total={pagination.total}
+              totalPages={pagination.totalPages}
+              onPageChange={setPage}
+            />
+          </div>
         </div>
       )}
     </div>

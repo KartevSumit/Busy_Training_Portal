@@ -30,7 +30,7 @@ export default function Catalog() {
     api.get('/courses/categories')
       .then(data => setCategories(data.categories || []))
       .catch(err => console.error('Failed to load categories', err));
-      
+
     if (user?.role === 'INSTRUCTOR') {
       api.get('/courses/instructors')
         .then(data => setInstructors(data.instructors || []))
@@ -43,19 +43,19 @@ export default function Catalog() {
     setError(null);
     try {
       const query = new URLSearchParams();
-      
+
       if (searchParams.get('q')) query.append('q', searchParams.get('q'));
       if (searchParams.get('category')) query.append('category', searchParams.get('category'));
-      
+
       if (user?.role === 'INSTRUCTOR') {
         if (searchParams.get('status')) query.append('status', searchParams.get('status'));
         if (searchParams.get('instructor')) query.append('instructor', searchParams.get('instructor'));
       }
-      
+
       if (searchParams.get('sort')) query.append('sort', searchParams.get('sort'));
-      
+
       query.append('page', searchParams.get('page') || '1');
-      query.append('pageSize', '10');
+      query.append('pageSize', '9');
 
       const data = await api.get(`/courses?${query.toString()}`);
       setCourses(data.data || []);
@@ -77,13 +77,13 @@ export default function Catalog() {
 
   const applyFiltersToUrl = () => {
     const newParams = new URLSearchParams(searchParams);
-    
+
     if (filters.q) newParams.set('q', filters.q);
     else newParams.delete('q');
-    
+
     if (filters.category) newParams.set('category', filters.category);
     else newParams.delete('category');
-    
+
     if (user?.role === 'INSTRUCTOR') {
       if (filters.status) newParams.set('status', filters.status);
       else newParams.delete('status');
@@ -110,7 +110,7 @@ export default function Catalog() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="flex flex-col flex-1 w-full">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Course Catalog</h1>
         <p className="mt-2 text-gray-600">
@@ -157,7 +157,7 @@ export default function Catalog() {
           </button>
         </div>
       ) : (
-        <>
+        <div className="flex flex-col flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map(course => (
               <CourseCard
@@ -170,14 +170,16 @@ export default function Catalog() {
             ))}
           </div>
 
-          <Pagination
-            page={pagination.page}
-            pageSize={pagination.pageSize}
-            total={pagination.total}
-            totalPages={pagination.totalPages}
-            onPageChange={handlePageChange}
-          />
-        </>
+          <div className="mt-auto pt-8">
+            <Pagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              total={pagination.total}
+              totalPages={pagination.totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

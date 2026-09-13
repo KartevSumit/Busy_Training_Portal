@@ -163,7 +163,7 @@ export default function LessonList({ courseId }) {
 
                   <div className="flex items-center gap-2 ml-4">
                     <button
-                      onClick={() => handleReorder(lesson.id, lesson.position, 'up')}
+                      onClick={() => handleReorder(lesson.id, index, 'up')}
                       disabled={isFirst || actionLoading}
                       className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-400"
                       title="Move Up"
@@ -171,7 +171,7 @@ export default function LessonList({ courseId }) {
                       <ArrowUp className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleReorder(lesson.id, lesson.position, 'down')}
+                      onClick={() => handleReorder(lesson.id, index, 'down')}
                       disabled={isLast || actionLoading}
                       className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-400"
                       title="Move Down"

@@ -107,7 +107,7 @@ export default function AppShell() {
           </div>
         </nav>
 
-        <main className="flex-1 max-w-7xl w-full mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <main className="flex-1 flex flex-col max-w-7xl w-full mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <Outlet />
         </main>
       </div>
