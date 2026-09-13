@@ -30,6 +30,16 @@ const Login = () => {
       
       if (loggedInUser?.role === 'ADMIN') {
         target = '/admin';
+      } else if (loggedInUser?.role === 'LEARNER') {
+        const allowedLearnerRoutes = ['/catalog', '/my-courses', '/courses'];
+        if (!allowedLearnerRoutes.some(route => target.startsWith(route))) {
+          target = '/catalog';
+        }
+      } else if (loggedInUser?.role === 'INSTRUCTOR') {
+        const allowedInstructorRoutes = ['/catalog', '/my-courses', '/courses', '/dashboard', '/alerts'];
+        if (!allowedInstructorRoutes.some(route => target.startsWith(route))) {
+          target = '/dashboard';
+        }
       }
       
       navigate(target, { replace: true });

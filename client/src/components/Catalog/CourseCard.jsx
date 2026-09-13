@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Calendar, BookOpen, CheckCircle } from 'lucide-react';
 import { api } from '../../lib/apiClient';
+import ConfirmationModal from '../ConfirmationModal';
 
-export default function CourseCard({ course, role, onEnrollSuccess }) {
+export default function CourseCard({ course, role, userId, onEnrollSuccess }) {
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [localEnrolled, setLocalEnrolled] = useState(false);
+  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
 
   const isEnrolled = course.is_enrolled || localEnrolled;
 
@@ -15,8 +17,8 @@ export default function CourseCard({ course, role, onEnrollSuccess }) {
     ARCHIVED: 'bg-red-100 text-red-800'
   };
 
-  const handleEnroll = async (e) => {
-    e.preventDefault();
+  const handleEnrollConfirm = async () => {
+    setIsEnrollModalOpen(false);
     if (isEnrolling || isEnrolled) return;
     
     setIsEnrolling(true);
@@ -35,8 +37,24 @@ export default function CourseCard({ course, role, onEnrollSuccess }) {
     }
   };
 
+  const handleEnrollClick = (e) => {
+    e.preventDefault();
+    setIsEnrollModalOpen(true);
+  };
+
   const CardContent = () => (
-    <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden">
+    <>
+      <ConfirmationModal
+        isOpen={isEnrollModalOpen}
+        title="Confirm Enrollment"
+        message={`Are you sure you want to enroll in "${course.title}"?`}
+        confirmText="Enroll"
+        isDestructive={false}
+        isLoading={isEnrolling}
+        onConfirm={handleEnrollConfirm}
+        onCancel={() => setIsEnrollModalOpen(false)}
+      />
+      <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden">
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-4">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
@@ -77,7 +95,7 @@ export default function CourseCard({ course, role, onEnrollSuccess }) {
             </button>
           ) : (
             <button
-              onClick={handleEnroll}
+              onClick={handleEnrollClick}
               disabled={isEnrolling}
               className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors"
             >
@@ -87,14 +105,18 @@ export default function CourseCard({ course, role, onEnrollSuccess }) {
         </div>
       )}
     </div>
+    </>
   );
 
   if (role === 'INSTRUCTOR') {
-    return (
-      <Link to={`/courses/${course.id}`} className="block h-full">
-        <CardContent />
-      </Link>
-    );
+    if (course.instructorId === userId) {
+      return (
+        <Link to={`/courses/${course.id}`} className="block h-full">
+          <CardContent />
+        </Link>
+      );
+    }
+    return <CardContent />;
   }
 
   return <CardContent />;

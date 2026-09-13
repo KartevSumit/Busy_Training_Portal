@@ -9,10 +9,15 @@ exports.completeLesson = async (req, res, next) => {
 
     const lesson = await prisma.lesson.findUnique({
       where: { id: lessonId },
+      include: { course: { select: { status: true } } }
     });
 
     if (!lesson) {
       throw new AppError(404, 'LESSON_NOT_FOUND', 'Lesson not found');
+    }
+
+    if (lesson.course.status === 'DRAFT') {
+      throw new AppError(403, 'COURSE_NOT_PUBLISHED', 'Cannot complete lessons in a DRAFT course');
     }
 
     const enrollment = await prisma.enrollment.findUnique({

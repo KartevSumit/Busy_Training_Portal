@@ -6,7 +6,9 @@ const {
   updateCourse,
   publishCourse,
   archiveCourse,
-  restoreCourse
+  restoreCourse,
+  getCategories,
+  getInstructors
 } = require('../controllers/course.controller');
 const {
   createLesson,
@@ -25,6 +27,8 @@ router.use(authenticateToken);
 
 router.post('/', requireRole('INSTRUCTOR'), createCourse);
 router.get('/', listCourses);
+router.get('/categories', getCategories);
+router.get('/instructors', requireRole('INSTRUCTOR'), getInstructors);
 router.get('/:id', getCourse);
 router.patch('/:id', requireRole('INSTRUCTOR'), updateCourse);
 

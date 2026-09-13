@@ -3,6 +3,8 @@ import { Search } from 'lucide-react';
 export default function CatalogFilters({
   role,
   filters,
+  categories = [],
+  instructors = [],
   onFilterChange,
   onSearchSubmit
 }) {
@@ -73,10 +75,9 @@ export default function CatalogFilters({
           className="mt-1 sm:mt-0 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
         >
           <option value="">All Categories</option>
-          <option value="Technology">Technology</option>
-          <option value="Business">Business</option>
-          <option value="Design">Design</option>
-          <option value="Health">Health</option>
+          {categories.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
         </select>
       </div>
 
@@ -100,16 +101,20 @@ export default function CatalogFilters({
           </div>
 
           <div className="sm:w-48">
-            <input
-              type="text"
+            <select
               name="instructor"
               value={filters.instructor || ''}
-              onChange={handleInputChange}
-              onKeyDown={handleSearchKey}
-              placeholder="Instructor UUID..."
-              className="mt-1 sm:mt-0 block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              title="Filter by exact Instructor UUID"
-            />
+              onChange={(e) => {
+                handleInputChange(e);
+                setTimeout(() => onSearchSubmit(), 0);
+              }}
+              className="mt-1 sm:mt-0 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            >
+              <option value="">All Instructors</option>
+              {instructors.map(inst => (
+                <option key={inst.id} value={inst.id}>{inst.email}</option>
+              ))}
+            </select>
           </div>
         </>
       )}

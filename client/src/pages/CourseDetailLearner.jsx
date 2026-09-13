@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../lib/apiClient';
 import { ArrowLeft, CheckCircle, Clock, BookOpen, AlertTriangle } from 'lucide-react';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const EnrollmentStatusBadge = ({ status }) => {
   const styles = {
@@ -46,6 +47,7 @@ export default function CourseDetailLearner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [enrolling, setEnrolling] = useState(false);
+  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
   const [completingId, setCompletingId] = useState(null);
 
   const fetchCourseData = useCallback(async () => {
@@ -75,7 +77,8 @@ export default function CourseDetailLearner() {
     fetchCourseData();
   }, [fetchCourseData]);
 
-  const handleEnroll = async () => {
+  const handleEnrollConfirm = async () => {
+    setIsEnrollModalOpen(false);
     if (enrolling) return;
     setEnrolling(true);
     try {
@@ -92,6 +95,10 @@ export default function CourseDetailLearner() {
     } finally {
       setEnrolling(false);
     }
+  };
+
+  const handleEnrollClick = () => {
+    setIsEnrollModalOpen(true);
   };
 
   const handleCompleteLesson = async (lessonId) => {
@@ -133,39 +140,50 @@ export default function CourseDetailLearner() {
   const totalCount = lessons.length;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-      <Link to="/catalog" className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 mb-2 transition-colors">
-        <ArrowLeft className="mr-1 h-4 w-4" /> Back to Catalog
-      </Link>
-      
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                  {course.category}
-                </span>
-                <CourseStatusBadge status={course.status} />
-                {enrollment && <EnrollmentStatusBadge status={enrollment.status} />}
+    <>
+      <ConfirmationModal
+        isOpen={isEnrollModalOpen}
+        title="Confirm Enrollment"
+        message={`Are you sure you want to enroll in "${course.title}"?`}
+        confirmText="Enroll"
+        isDestructive={false}
+        isLoading={enrolling}
+        onConfirm={handleEnrollConfirm}
+        onCancel={() => setIsEnrollModalOpen(false)}
+      />
+      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
+        <Link to="/catalog" className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 mb-2 transition-colors">
+          <ArrowLeft className="mr-1 h-4 w-4" /> Back to Catalog
+        </Link>
+        
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                    {course.category}
+                  </span>
+                  <CourseStatusBadge status={course.status} />
+                  {enrollment && <EnrollmentStatusBadge status={enrollment.status} />}
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
+              
+              {!enrollment && course.status === 'PUBLISHED' && (
+                <button
+                  onClick={handleEnrollClick}
+                  disabled={enrolling}
+                  className="w-full md:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm"
+                >
+                  {enrolling ? 'Enrolling...' : 'Enroll Now'}
+                </button>
+              )}
             </div>
             
-            {!enrollment && course.status === 'PUBLISHED' && (
-              <button
-                onClick={handleEnroll}
-                disabled={enrolling}
-                className="w-full md:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm"
-              >
-                {enrolling ? 'Enrolling...' : 'Enroll Now'}
-              </button>
-            )}
-          </div>
-          
-          <div className="prose max-w-none text-gray-600">
-            {course.description ? <p>{course.description}</p> : <p className="italic text-gray-400">No description provided.</p>}
-          </div>
+            <div className="prose max-w-none text-gray-600">
+              {course.description ? <p>{course.description}</p> : <p className="italic text-gray-400">No description provided.</p>}
+            </div>
           
           {!enrollment && course.status !== 'PUBLISHED' && (
             <div className="mt-6 p-4 bg-yellow-50 text-yellow-800 rounded-md text-sm border border-yellow-200">
@@ -238,5 +256,6 @@ export default function CourseDetailLearner() {
         </div>
       )}
     </div>
+    </>
   );
 }

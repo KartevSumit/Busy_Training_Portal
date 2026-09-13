@@ -99,7 +99,7 @@ export default function ActivityLog({ courseId }) {
             value={commentText}
             onChange={e => setCommentText(e.target.value)}
             placeholder="Add a comment..."
-            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           ></textarea>
           {commentError && <div className="text-red-600 text-sm">{commentError}</div>}
           <button

@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/apiClient';
 import { ChevronDown, ChevronUp, ArrowUp, ArrowDown, Edit2, Trash2 } from 'lucide-react';
+import ConfirmationModal from '../ConfirmationModal';
 
 export default function LessonList({ courseId }) {
+  const [lessonToDelete, setLessonToDelete] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -48,17 +50,27 @@ export default function LessonList({ courseId }) {
     }
   };
 
-  const handleDelete = async (lessonId) => {
-    if (!window.confirm('Are you sure you want to delete this lesson?')) return;
+  const handleDeleteClick = (lesson) => {
+    setLessonToDelete(lesson);
+  };
+
+  const confirmDelete = async () => {
+    if (!lessonToDelete) return;
     setActionLoading(true);
     try {
-      await api.delete(`/lessons/${lessonId}`);
+      await api.delete(`/lessons/${lessonToDelete.id}`);
       await fetchLessons();
+      setLessonToDelete(null);
     } catch (err) {
       alert(err.message);
+      setLessonToDelete(null);
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setLessonToDelete(null);
   };
 
   const handleAddSubmit = async (e) => {
@@ -111,8 +123,19 @@ export default function LessonList({ courseId }) {
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Lessons</h2>
+    <>
+      <ConfirmationModal
+        isOpen={!!lessonToDelete}
+        title="Delete Lesson"
+        message={lessonToDelete ? `Are you sure you want to delete "${lessonToDelete.title}"? This action cannot be undone.` : ''}
+        confirmText="Delete"
+        isDestructive={true}
+        isLoading={actionLoading}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Lessons</h2>
 
       <div className="space-y-4">
         {lessons.length === 0 ? (
@@ -165,7 +188,7 @@ export default function LessonList({ courseId }) {
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(lesson.id)}
+                      onClick={() => handleDeleteClick(lesson)}
                       disabled={actionLoading}
                       className="p-1 text-gray-400 hover:text-red-600"
                       title="Delete"
@@ -186,7 +209,7 @@ export default function LessonList({ courseId }) {
                             required
                             value={editForm.title}
                             onChange={e => setEditForm({ ...editForm, title: e.target.value })}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm sm:text-sm"
                           />
                         </div>
                         <div>
@@ -196,7 +219,7 @@ export default function LessonList({ courseId }) {
                             rows={4}
                             value={editForm.content}
                             onChange={e => setEditForm({ ...editForm, content: e.target.value })}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm sm:text-sm"
                           />
                         </div>
                         {editError && <div className="text-red-600 text-sm">{editError}</div>}
@@ -236,7 +259,7 @@ export default function LessonList({ courseId }) {
                 required
                 value={addForm.title}
                 onChange={e => setAddForm({ ...addForm, title: e.target.value })}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm sm:text-sm"
               />
             </div>
             <div>
@@ -246,7 +269,7 @@ export default function LessonList({ courseId }) {
                 rows={4}
                 value={addForm.content}
                 onChange={e => setAddForm({ ...addForm, content: e.target.value })}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm sm:text-sm"
               />
             </div>
             {addError && <div className="text-red-600 text-sm">{addError}</div>}
@@ -258,5 +281,6 @@ export default function LessonList({ courseId }) {
         )}
       </div>
     </div>
+    </>
   );
 }

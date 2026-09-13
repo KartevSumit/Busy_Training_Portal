@@ -23,6 +23,21 @@ export default function Catalog() {
     sort: searchParams.get('sort') || 'title',
   });
 
+  const [categories, setCategories] = useState([]);
+  const [instructors, setInstructors] = useState([]);
+
+  useEffect(() => {
+    api.get('/courses/categories')
+      .then(data => setCategories(data.categories || []))
+      .catch(err => console.error('Failed to load categories', err));
+      
+    if (user?.role === 'INSTRUCTOR') {
+      api.get('/courses/instructors')
+        .then(data => setInstructors(data.instructors || []))
+        .catch(err => console.error('Failed to load instructors', err));
+    }
+  }, [user?.role]);
+
   const fetchCatalog = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -108,6 +123,8 @@ export default function Catalog() {
       <CatalogFilters
         role={user?.role}
         filters={filters}
+        categories={categories}
+        instructors={instructors}
         onFilterChange={handleFilterChange}
         onSearchSubmit={applyFiltersToUrl}
       />
@@ -147,6 +164,7 @@ export default function Catalog() {
                 key={course.id}
                 course={course}
                 role={user?.role}
+                userId={user?.id}
                 onEnrollSuccess={handleEnrollSuccess}
               />
             ))}

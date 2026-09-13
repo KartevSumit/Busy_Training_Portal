@@ -66,7 +66,7 @@ exports.addComment = async (req, res, next) => {
     if (course.instructorId === req.user.id || req.user.role === 'ADMIN') {
       canComment = true;
     } else if (req.user.role === 'LEARNER') {
-      if (course.status === 'PUBLISHED') {
+      if (course.status === 'PUBLISHED' || course.status === 'ARCHIVED') {
         const enrollment = await prisma.enrollment.findUnique({
           where: { learnerId_courseId: { learnerId: req.user.id, courseId } }
         });

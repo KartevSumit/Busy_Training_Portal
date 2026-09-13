@@ -104,3 +104,30 @@ exports.listCourses = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getCategories = async (req, res, next) => {
+  try {
+    const categories = await prisma.course.findMany({
+      select: { category: true },
+      distinct: ['category'],
+      orderBy: { category: 'asc' }
+    });
+    const categoryList = categories.map(c => c.category).filter(c => c);
+    res.status(200).json({ categories: categoryList });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getInstructors = async (req, res, next) => {
+  try {
+    const instructors = await prisma.user.findMany({
+      where: { role: 'INSTRUCTOR' },
+      select: { id: true, email: true },
+      orderBy: { email: 'asc' }
+    });
+    res.status(200).json({ instructors });
+  } catch (error) {
+    next(error);
+  }
+};

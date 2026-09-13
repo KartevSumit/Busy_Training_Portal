@@ -68,7 +68,7 @@ export default function BulkEnrollment({ courseId }) {
           value={emailsRaw}
           onChange={e => setEmailsRaw(e.target.value)}
           placeholder="learner1@example.com&#10;learner2@example.com"
-          className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono"
+          className="block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono"
         ></textarea>
         {error && <div className="text-red-600 text-sm">{error}</div>}
         <button
