@@ -9,6 +9,7 @@ const progressRoutes = require('./routes/progress.routes');
 const alertRoutes = require('./routes/alert.routes');
 const quizRoutes = require('./routes/quiz.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const healthRoutes = require('./routes/health.routes');
 const errorHandler = require('./middleware/error.middleware');
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api/lessons', progressRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/health', healthRoutes);
 
 app.use(errorHandler);
 
