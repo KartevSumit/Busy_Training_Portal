@@ -64,7 +64,7 @@ export default function InstructorDashboard() {
       name: `${d.getUTCMonth() + 1}/${d.getUTCDate()}`,
       count: t.count
     };
-  }).reverse();
+  });
 
   return (
     <div className="flex flex-col flex-1 space-y-8 w-full">

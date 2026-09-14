@@ -34,6 +34,8 @@ The database for the application relies on PostgreSQL hosted by Supabase and is 
 | title | String | No | - | Title of the specific lesson. |
 | content | String | No | - | Raw lesson text content. |
 | position | Int | No | - | Sort-order integer controlling the sequence. |
+| resourceUrl | String | Yes | - | Maps to `resource_url`. Optional external resource link. |
+| resourceName | String | Yes | - | Maps to `resource_name`. Optional display name for the resource (requires resourceUrl). |
 | createdAt | DateTime | No | now() | Maps to `created_at`. |
 | updatedAt | DateTime | No | (auto) | Maps to `updated_at`. |
 
@@ -81,6 +83,32 @@ The database for the application relies on PostgreSQL hosted by Supabase and is 
 | courseId | String | No | - | Maps to `course_id`. Course this comment belongs to. |
 | authorId | String | No | - | Maps to `author_id`. User (Instructor or Learner) who wrote it. |
 | text | String | No | - | Raw comment text. |
+| lessonId | String | Yes | - | Maps to `lesson_id`. Links the comment to a specific lesson. |
+| createdAt | DateTime | No | now() | Maps to `created_at`. |
+| updatedAt | DateTime | No | (auto) | Maps to `updated_at`. |
+
+
+### Quiz
+| Field | Type | Nullable | Default | Description |
+|---|---|---|---|---|
+| id | String | No | uuid() | UUID Primary key. |
+| courseId | String | No | - | Maps to `course_id`. Parent course identifier. |
+| title | String | No | - | Title of the quiz. |
+| createdAt | DateTime | No | now() | Maps to `created_at`. |
+| updatedAt | DateTime | No | (auto) | Maps to `updated_at`. |
+
+### QuizQuestion
+| Field | Type | Nullable | Default | Description |
+|---|---|---|---|---|
+| id | String | No | uuid() | UUID Primary key. |
+| quizId | String | No | - | Maps to `quiz_id`. Parent quiz identifier. |
+| question | String | No | - | The MCQ question text. |
+| optionA | String | No | - | Maps to `option_a`. |
+| optionB | String | No | - | Maps to `option_b`. |
+| optionC | String | No | - | Maps to `option_c`. |
+| optionD | String | No | - | Maps to `option_d`. |
+| correctOption | String | No | - | Maps to `correct_option`. The correct answer (A, B, C, or D). |
+| position | Int | No | - | Sort-order integer controlling the sequence. |
 | createdAt | DateTime | No | now() | Maps to `created_at`. |
 | updatedAt | DateTime | No | (auto) | Maps to `updated_at`. |
 
@@ -88,7 +116,7 @@ The database for the application relies on PostgreSQL hosted by Supabase and is 
 - **Role**: `ADMIN`, `INSTRUCTOR`, `LEARNER`
 - **CourseStatus**: `DRAFT`, `PUBLISHED`, `ARCHIVED`
 - **EnrollmentStatus**: `NOT_STARTED`, `IN_PROGRESS`, `COMPLETED`
-- **ActivityActionType**: `COURSE_CREATED`, `COURSE_UPDATED`, `COURSE_PUBLISHED`, `COURSE_ARCHIVED`, `COURSE_RESTORED`, `COMMENT_ADDED`
+- **ActivityActionType**: `COURSE_CREATED`, `COURSE_UPDATED`, `COURSE_PUBLISHED`, `COURSE_ARCHIVED`, `COURSE_RESTORED`, `COMMENT_ADDED`, `QUIZ_CREATED`
 
 ---
 
@@ -102,6 +130,9 @@ The database for the application relies on PostgreSQL hosted by Supabase and is 
 - **Course → ActivityLog**: A Course has multiple ActivityLogs (`onDelete: Cascade`).
 - **Course → AlertDismissal**: A Course has multiple AlertDismissals (`onDelete: Cascade`).
 - **Course → Comment**: A Course has multiple Comments (`onDelete: Cascade`).
+- **Course → Quiz**: A Course has multiple Quizzes (`onDelete: Cascade`).
+- **Quiz → QuizQuestion**: A Quiz has multiple QuizQuestions (`onDelete: Cascade`).
+- **Lesson → Comment**: A Lesson can optionally have multiple Comments (`onDelete: Cascade`).
 - **User → ActivityLog**: A User (actorId) creates multiple ActivityLogs.
 - **User → Comment**: A User (authorId) writes multiple Comments (`onDelete: Cascade`).
 - **User → AlertDismissal**: A User (learnerId) has multiple AlertDismissals (`onDelete: Cascade`).
@@ -180,6 +211,9 @@ erDiagram
     Course ||--o{ Enrollment : "has"
     Course ||--o{ ActivityLog : "logs"
     Course ||--o{ Comment : "discussions"
+    Course ||--o{ Quiz : "quizzes"
+    Quiz ||--o{ QuizQuestion : "questions"
+    Lesson ||--o{ Comment : "discussions"
     Course ||--o{ AlertDismissal : "alerts"
 
     Lesson ||--o{ LessonProgress : "tracked by"

@@ -56,6 +56,7 @@ model Course {
   ActivityLog    ActivityLog[]
   AlertDismissal AlertDismissal[]
   comments       Comment[]
+  Quiz           Quiz[]
 
   @@index([instructorId])
   @@index([status])
@@ -71,8 +72,11 @@ model Lesson {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  course   Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  progress LessonProgress[]
+  course       Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress     LessonProgress[]
+  resourceUrl  String?          @map("resource_url")
+  resourceName String?          @map("resource_name")
+  comments     Comment[]
 
   @@unique([courseId, position])
   @@index([courseId, position])
@@ -120,6 +124,7 @@ enum ActivityActionType {
   COURSE_ARCHIVED
   COURSE_RESTORED
   COMMENT_ADDED
+  QUIZ_CREATED
 }
 
 model ActivityLog {
@@ -161,10 +166,47 @@ model Comment {
   text      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  lessonId  String?  @map("lesson_id")
 
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  course Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  author User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@index([courseId, createdAt(sort: Desc)])
+  @@index([lessonId])
   @@map("comments")
+}
+
+model Quiz {
+  id        String   @id @default(uuid())
+  courseId  String   @map("course_id")
+  title     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course    Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+
+  @@index([courseId])
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id            String   @id @default(uuid())
+  quizId        String   @map("quiz_id")
+  question      String
+  optionA       String   @map("option_a")
+  optionB       String   @map("option_b")
+  optionC       String   @map("option_c")
+  optionD       String   @map("option_d")
+  correctOption String   @map("correct_option")
+  position      Int
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, position])
+  @@index([quizId, position])
+  @@map("quiz_questions")
 }

@@ -77,11 +77,19 @@ The frontend was then built in the original U1–U7 feature structure:
    - navigation badge
    - shared alert count through the existing `AuthContext`
 
+### Stretch Features (Post-Core Extension)
+
+After completing the core requirements, three intentionally scoped stretch features were added:
+
+1. **Course-level MCQ Quizzes**: Added direct course-level quizzes (not attached to lessons) containing 4-option MCQs. Kept scoring entirely server-side so correct options are never exposed to learners. Built restricted to a single correct answer and basic submission without building a massive full quiz engine.
+2. **Lesson Resources**: Added optional lightweight resource links (`resourceUrl` and `resourceName`) directly to lessons instead of building a native file upload/storage subsystem. Enforced strict validation where names cannot exist without URLs.
+3. **Lesson Discussions/Comments**: Added flat discussion/comment sections to lessons. Fully reused the existing `Comment` and `ActivityLog` backend infrastructure rather than introducing a separate threaded/nested forum system.
+
 ### Testing
 
 A final end-to-end audit was performed across the backend routes and frontend flows. Two backend issues and one frontend issue were found and fixed during the audit.
 
-The final automated test run completed with 2 test suites and 23/23 tests passing.
+The final automated test run completed with 3 test suites and 42/42 tests passing.
 
 ### Documentation/finalization
 
@@ -153,14 +161,11 @@ The following were deliberately not built:
 
 - email inactivity notifications or digest jobs
 - polling and WebSocket-based alert updates
-- quizzes
 - certificates
-- discussion-thread features
 - prerequisites
 - video/watch-progress features
 - ratings/reviews
 - learning paths
-- downloadable lesson resources
 - complex filtering/sorting/pagination for personal My Courses and Alerts pages
 - deep admin analytics or full admin course management
 - unnecessary dashboard drill-down functionality

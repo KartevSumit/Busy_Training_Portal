@@ -4,6 +4,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { api } from '../lib/apiClient';
 import { ArrowLeft, CheckCircle, Clock, BookOpen, AlertTriangle } from 'lucide-react';
 import ConfirmationModal from '../components/ConfirmationModal';
+import LessonResource from '../components/LessonResource';
+import LessonDiscussion from '../components/LessonDiscussion';
+import LearnerQuizList from '../components/LearnerQuizList';
 
 const EnrollmentStatusBadge = ({ status }) => {
   const styles = {
@@ -192,7 +195,6 @@ export default function CourseDetailLearner() {
           )}
         </div>
       </div>
-
       {enrollment && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -232,8 +234,11 @@ export default function CourseDetailLearner() {
                     <div className="flex-1">
                       <h4 className={`text-lg font-medium ${lesson.isCompleted ? 'text-gray-900' : 'text-gray-900'}`}>{lesson.title}</h4>
                       <p className="mt-1 text-sm text-gray-600">{lesson.content}</p>
+                      <LessonResource resourceUrl={lesson.resourceUrl} resourceName={lesson.resourceName} />
+                      <LessonDiscussion lessonId={lesson.id} courseId={course.id} />
+
                     </div>
-                    <div className="flex-shrink-0 mt-4 sm:mt-0 self-start sm:self-center">
+                    <div className="flex-shrink-0 mt-4 sm:mt-1 self-start">
                       {lesson.isCompleted ? (
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
                           Completed
@@ -253,6 +258,7 @@ export default function CourseDetailLearner() {
               )}
             </ul>
           </div>
+          <LearnerQuizList courseId={course.id} isEnrolled={!!enrollment} />
         </div>
       )}
     </div>

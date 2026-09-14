@@ -2,13 +2,16 @@ const express = require('express');
 const { 
   updateLesson, 
   deleteLesson, 
-  reorderLesson 
+  reorderLesson,
+  getLessonComments 
 } = require('../controllers/lesson.controller');
 const { authenticateToken, requireRole } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
 router.use(authenticateToken);
+
+router.get('/:id/comments', getLessonComments);
 
 router.patch('/:id', requireRole('INSTRUCTOR'), updateLesson);
 router.delete('/:id', requireRole('INSTRUCTOR'), deleteLesson);

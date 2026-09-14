@@ -48,6 +48,9 @@ The backend uses an explicit Express-based structure:
 - **Enrollment**: Self-enrollment (Learner), instructor manual enrollment, and bulk enrollment.
 - **Learner Progress**: Enrollment → lesson completion → derived enrollment status.
 - **Activity/Comments**: Comment creation → comment persistence + activity-log entry inside a Prisma transaction.
+- **Lesson Discussions**: A flat comment capability reusing the existing Activity/Comment infrastructure, allowing enrolled learners to post comments on specific lessons.
+- **Lesson Resources**: Optional external resource links (URL and optional name) attached directly to lessons.
+- **Quizzes**: Course-level MCQ quizzes with server-side scoring. They are independent of lessons and restricted to enrolled learners (if the course is published).
 - **Inactivity Alerts**: Query-driven alerts. There is no cron, background worker, polling, or WebSocket. `IN_PROGRESS` enrollment → inactivity calculation → alert → episode-scoped dismissal.
 - **CSV Export**: Authenticated request → relational data retrieved via Prisma → CSV string generated in memory as a response → frontend receives/downloads it as a Blob object URL. The current implementation is buffered/in-memory rather than streamed.
 
@@ -68,10 +71,14 @@ The REST API is partitioned into these representative functional route groups:
 - **Auth**: `/api/auth/login`, `/api/auth/register`, `/api/auth/me`
 - **Courses**: `/api/courses` (GET list, POST create), `/api/courses/:id` (GET, PATCH), `/api/courses/:id/publish`
 - **Lessons**: `/api/courses/:id/lessons` (GET, POST), `/api/lessons/:id/reorder`, `/api/lessons/:id/complete`
+- **Quizzes**: `/api/courses/:id/quizzes` (GET, POST), `/api/quizzes/:id` (GET, PATCH, DELETE), `/api/quizzes/:id/questions` (POST), `/api/quizzes/questions/:id` (PATCH, DELETE), `/api/quizzes/:id/submit` (POST)
 - **Enrollment/Me**: `/api/courses/:id/enroll`, `/api/courses/:id/enroll-bulk`, `/api/me/enrollments`
 - **Dashboard**: `/api/dashboard/summary`
 - **Alerts**: `/api/alerts`, `/api/alerts/count`, `/api/courses/:id/alerts/:learnerId/dismiss`
 - **Activity/Comments**: `/api/courses/:id/comments`, `/api/courses/:id/activity`
+- **Lesson Discussions**: A flat comment capability reusing the existing Activity/Comment infrastructure, allowing enrolled learners to post comments on specific lessons.
+- **Lesson Resources**: Optional external resource links (URL and optional name) attached directly to lessons.
+- **Quizzes**: Course-level MCQ quizzes with server-side scoring. They are independent of lessons and restricted to enrolled learners (if the course is published).
 - **CSV Export**: `/api/courses/:id/progress-export.csv`
 
 ## 8. Data Access / Query Design

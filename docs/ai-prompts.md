@@ -570,16 +570,99 @@ The final alert list still owns its local loading/error/dismiss state, while the
 
 ---
 
-# Problems explicitly captured in the prompt history
 
-The prompt history contains several explicit problem-driven follow-ups rather than only planned requirements:
+---
 
-- unrestricted instructor creation → introduce a minimal `ADMIN` provisioning role
-- passwords were always hidden → add a password visibility toggle
-- draft courses were visible to students → separate enrollment from learner content access
-- lesson reorder produced an incorrect implementation → correct the loop to update `allLessons[i]` and strengthen persisted-position tests
+## 16. Stretch — Quizzes, lesson resources and lesson discussions
 
-These are kept as concrete development-history entries because they are present in the source prompt history, rather than being inferred from the final architecture.
+### Prompt
+
+> Add three small stretch features without disturbing the completed core application: course-level MCQ quizzes, optional resources on lessons, and a simple discussion/comment area for each lesson.
+>
+> Quizzes should be first-class course content rather than being attached to lessons. An instructor can create a quiz and manage four-option multiple-choice questions with one correct option. Learners can answer and submit the quiz, with the server calculating the score. Never expose the correct option in learner-facing quiz data. Keep the quiz scope deliberately small; no timers, attempts, question randomization or other full quiz-engine features.
+>
+> Add an optional resource link to lessons using a URL and an optional display name. A URL may exist without a name, but a name must never exist without a URL. This is only a resource link, not a file-upload or storage system.
+>
+> Add a simple discussion section to each lesson using the existing comment infrastructure. Anyone who is allowed to access the lesson should be able to post a comment according to the existing course access rules. Keep it flat: no replies or nested threads.
+>
+> Reuse the existing authentication, authorization, Comment and ActivityLog patterns. Add focused backend tests for the new behavior and keep all existing required functionality working.
+
+### Result
+
+The three stretch features were added without changing the existing course/lesson architecture:
+
+- **Quizzes** became first-class course content with dedicated quiz/question models and instructor and learner flows. Quiz answers are evaluated on the server, while the stored correct option is kept out of learner-facing quiz responses.
+- **Lesson resources** were added as optional `resourceUrl` and `resourceName` fields. The URL can be used by itself; a resource name is accepted only when a URL is present. Learners see the saved resource as a link.
+- **Lesson discussions** were added as simple flat comments attached to lessons, reusing the existing Comment and ActivityLog infrastructure. There is no reply or nested-thread model.
+
+The new functionality followed the existing role and course-access rules, including instructor ownership checks, learner enrollment checks, draft-course restrictions and retained access for enrolled learners on archived courses.
+
+### Correction / Review
+
+The stretch work was intentionally kept small rather than becoming three separate subsystems. Quizzes remained MCQ-only, resources remained URL-based, and lesson discussions remained a flat comment section. Dedicated frontend/backend modules were then used where the new code needed clearer separation from the existing course and lesson components.
+
+Focused Supertest coverage was added for quiz authorization/scoring, resource validation and persistence, and lesson discussion authorization/isolation. The stretch code was then separated into dedicated frontend/backend modules where appropriate without changing its behavior or API contracts.
+
+---
+
+# Final Audit, Testing and Cleanup
+
+## Prompt
+
+> Do a final audit of the completed application after the feature work. Inspect every backend route and the major frontend flows, checking authentication, authorization, ownership, lifecycle rules, validation, database behavior, frontend/backend contracts and important edge cases. Look specifically for IDOR or privilege-escalation issues rather than assuming existing role checks are sufficient.
+>
+> Create meaningful Jest/Supertest coverage for the important backend behavior and keep the tests in the repository. Verify important persisted database state, not only HTTP status codes. Also inspect the frontend for genuine integration or navigation problems. After the audit, clean up any confirmed temporary or redundant implementation files without changing behavior.
+
+## Result
+
+The final audit inspected 23 backend routes across the existing controller groups and the major frontend pages, components and flows. It identified and corrected three application issues: learner access to draft-course progress, archived-course commenting, and an instructor catalog navigation problem.
+
+The audit also verified the three stretch features and their authorization boundaries.
+
+A final repository-wide cleanup removed temporary patch/iteration scripts left from implementation and corrected a duplicated learner quiz rendering block. The Prisma schema was also cleaned of an unused quiz-to-user relation from an earlier draft. Historical migrations were retained.
+
+## Automated testing
+
+The final repository used Jest + Supertest with three test suites, including the existing inactivity coverage, backend audit coverage and stretch-feature coverage.
+
+Final command:
+
+    npm run test
+
+Final result:
+
+```text
+Test Suites: 3 passed, 3 total
+Tests:       42 passed, 42 total
+Snapshots:   0 total
+Ran all test suites.
+```
+
+The tests cover the core authorization and business-rule boundaries as well as stretch functionality such as quiz scoring/authorization, resource validation and persistence, and lesson discussion authorization/isolation.
+
+## Testing issues and corrections
+
+### Learner draft-course access
+
+A learner who had been bulk-enrolled into a DRAFT course could potentially call the lesson-completion endpoint directly if the lesson ID was known. The progress controller was checking enrollment but not the course status.
+
+The controller was corrected to verify the lesson's course status and reject DRAFT content, with regression coverage added for the case.
+
+### Archived-course comments
+
+Enrolled learners could not comment on ARCHIVED courses because the comment authorization check only allowed PUBLISHED courses. The condition was corrected to allow appropriately enrolled learners on both PUBLISHED and ARCHIVED courses.
+
+### Instructor catalog navigation
+
+Instructors could click another instructor's course and reach an edit route that correctly returned 403, but the frontend flow was confusing. The course card was corrected to link to the edit page only for courses owned by the current instructor.
+
+### Test isolation
+
+The first audit run attempted to delete ActivityLog records during cleanup. PostgreSQL correctly rejected this because activity logs are intentionally immutable. The test isolation strategy was changed to use unique test data instead of deleting immutable activity records, without disabling the database protection.
+
+## Review
+
+The final audit and cleanup were used to verify the completed implementation rather than to expand the scope further. The final test suite passed 42/42 tests, and the frontend production build also completed successfully.
 
 # Overall development approach
 
@@ -602,65 +685,3 @@ The most useful AI-assisted work was not simply generating CRUD code. The prompt
 Several implementation decisions were also intentionally kept small because this was a roughly 12-hour take-home: there was no full admin product, no background alert worker, no websocket/polling system, no streaming CSV service and no unnecessary abstraction layer.
 
 The important lesson from the development was that generated code still needed active review. The lesson reorder loop bug, progress/inactivity timestamp semantics, learner draft access, cross-course progress isolation, comment authorization and frontend alert-state synchronization all required checking the actual behavior rather than assuming the first implementation was correct.
-
----
-
-# Automated testing
-
-## Prompt
-
-> Do a final audit of the completed application. Inspect every backend route and the major frontend flows, checking authentication, authorization, ownership, lifecycle rules, validation, database behavior, frontend/backend contracts and important edge cases. Look specifically for IDOR or privilege-escalation issues rather than assuming the existing role checks are sufficient.
->
-> Create a meaningful Jest/Supertest audit test suite for the important backend behavior and keep the tests in the repository. Run the full test suite and add regression coverage for any real issues found. Verify important persisted database state, not only HTTP status codes.
->
-> Also review the corresponding frontend flows and fix any genuine integration or navigation problems found during the audit.
-
-## Result
-
-The final audit inspected 23 backend routes across the existing controller groups and the major frontend pages/components and flows. The automated suite consisted of two Jest test files:
-
-- `src/tests/backend-audit.test.js`
-- `src/tests/t8.test.js`
-
-
-Final result:
-
-```text
-Test Suites: 2 passed, 2 total
-Tests:       23 passed, 23 total
-Snapshots:   0 total
-Time:        71.831 s
-Ran all test suites.
-```
-
-The automated tests covered the main authorization and business-rule boundaries, including role isolation, course ownership and lifecycle, draft-course access, lesson ordering, enrollment, progress, catalog behavior, dashboard aggregates, inactivity alerts, cross-course progress isolation, comments/activity logging and CSV export.
-
-## Corrections found during the audit
-
-### Learner draft-course access
-
-A learner who had been bulk-enrolled into a DRAFT course could potentially call the lesson-completion endpoint directly if the lesson ID was known. The progress controller was checking enrollment but not the course status.
-
-The controller was corrected to verify the lesson's course status and reject DRAFT content. A regression test was added for this case.
-
-### Archived-course comments
-
-Enrolled learners could not comment on ARCHIVED courses because the comment authorization check only allowed PUBLISHED courses.
-
-The condition was corrected so appropriately enrolled learners can comment on both PUBLISHED and ARCHIVED courses.
-
-### Instructor catalog navigation
-
-Instructors could click another instructor's course and be sent to an edit route that correctly returned 403, but this was a confusing frontend flow.
-
-The course card was corrected to link to the edit page only when the course belongs to the current instructor.
-
-### Test isolation
-
-The first audit test run attempted to delete ActivityLog records during cleanup. The database correctly rejected this because activity logs are intentionally immutable.
-
-The test isolation strategy was changed to generate unique test data instead of deleting immutable activity records. The final suite passes without disabling the database immutability protection.
-
-## Review
-
-The final audit found and corrected the three application issues above. The completed Jest/Supertest suite finished with 23/23 tests passing, with no known remaining correctness or authorization issues in the audited scope.

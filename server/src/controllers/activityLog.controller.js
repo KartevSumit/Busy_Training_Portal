@@ -48,7 +48,7 @@ exports.getCourseActivity = async (req, res, next) => {
 exports.addComment = async (req, res, next) => {
   try {
     const courseId = req.params.id;
-    const { text } = req.body;
+    const { text, lessonId } = req.body;
     
     if (!text || typeof text !== 'string' || text.trim() === '') {
       throw new AppError(400, 'VALIDATION_ERROR', 'Comment text is required');
@@ -85,7 +85,8 @@ exports.addComment = async (req, res, next) => {
         data: {
           courseId,
           authorId: req.user.id,
-          text: text.trim()
+          text: text.trim(),
+          ...(lessonId && { lessonId })
         }
       });
 
@@ -98,10 +99,10 @@ exports.addComment = async (req, res, next) => {
         }
       });
 
-      return { comment, activity };
+      return { comment: await tx.comment.findUnique({ where: { id: comment.id }, include: { author: { select: { email: true, role: true } } } }), activity };
     });
 
-    res.status(201).json({ data: result.activity });
+    res.status(201).json({ data: result.activity, comment: result.comment });
   } catch (error) {
     next(error);
   }

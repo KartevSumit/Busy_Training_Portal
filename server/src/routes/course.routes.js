@@ -21,6 +21,8 @@ const {
 const { authenticateToken, requireRole } = require('../middleware/auth.middleware');
 const { getCourseActivity, addComment } = require('../controllers/activityLog.controller');
 
+const { createQuiz, listQuizzes } = require('../controllers/quiz.controller');
+
 const router = express.Router();
 
 router.use(authenticateToken);
@@ -43,6 +45,9 @@ router.post('/:id/restore', requireRole('INSTRUCTOR'), restoreCourse);
 
 router.post('/:id/lessons', requireRole('INSTRUCTOR'), createLesson);
 router.get('/:id/lessons', getCourseLessons);
+
+router.post('/:id/quizzes', requireRole('INSTRUCTOR'), createQuiz);
+router.get('/:id/quizzes', listQuizzes);
 
 router.post('/:id/enroll', enroll);
 router.post('/:id/enroll-bulk', requireRole('INSTRUCTOR'), bulkEnroll);

@@ -416,3 +416,93 @@ The implementation favors **server-authoritative business rules, minimal fronten
 Where correctness mattered more than convenience, the implementation was strengthened with explicit authorization checks, relational data scoping, transactional writes, and tests against persisted results.
 
 Where complexity was not justified by the assignment, it was deliberately avoided.
+
+
+## 23. Course-level Quizzes
+
+### Chosen
+Model quizzes directly under courses rather than attaching them to specific lessons.
+
+### Rejected / Alternative
+Embedding quizzes inside lesson records.
+
+### Why
+Treating quizzes as first-class course-level content keeps the schema decoupled. It allows instructors to structure quizzes independently of lesson sequences (e.g., as general course assessments) without overloading the `Lesson` model with distinct evaluation logic.
+
+---
+
+## 24. MCQ-only Scope
+
+### Chosen
+Implement quizzes using strictly four-option, single-answer Multiple Choice Questions (MCQs).
+
+### Rejected / Alternative
+Building a full comprehensive quiz engine supporting free-text, multiple-select, matching, and true/false question types.
+
+### Why
+Restricting to single-answer 4-option MCQs delivers the core assessment capability while remaining deliberately scoped. It avoids the combinatorial complexity of scoring and rendering multiple varying question types for a stretch feature.
+
+---
+
+## 25. Server-side Scoring
+
+### Chosen
+Keep the correct option exclusively server-side and evaluate submissions on the backend.
+
+### Rejected / Alternative
+Sending the correct answer payload to the frontend and grading locally in the browser.
+
+### Why
+Exposing correct answers in the frontend retrieval response undermines quiz integrity, as any learner could inspect network requests to find the answers. Backend scoring ensures true evaluation.
+
+---
+
+## 26. Lesson Resources
+
+### Chosen
+Implement resources as a simple external URL and optional display name attached to the lesson.
+
+### Rejected / Alternative
+Building a native file upload, object storage (S3), and download-processing subsystem.
+
+### Why
+A lightweight URL-based resource link avoids introducing massive file-handling, storage-cost, and security-scanning complexities. Instructors can easily link to external drives (Google Drive, Dropbox, etc.) to share files.
+
+---
+
+## 27. Resource Validation
+
+### Chosen
+Enforce that a resource name requires a resource URL to be valid, but a URL can exist without a name.
+
+### Rejected / Alternative
+Making both optional independently, or requiring both.
+
+### Why
+A URL alone functions as a raw clickable link (valid). A name alone has no destination and is an orphaned, non-functional text fragment (invalid).
+
+---
+
+## 28. Lesson Discussions
+
+### Chosen
+Implement a simple, flat discussion/comment section for lessons.
+
+### Rejected / Alternative
+Building a complex threaded forum system with nested replies, upvotes, and moderation queues.
+
+### Why
+A flat comment thread satisfies the goal of learner-instructor engagement without the heavy UX and recursive data-fetching complexities inherent to deeply nested threaded discussions.
+
+---
+
+## 29. Reuse of existing Comment/ActivityLog
+
+### Chosen
+Reuse the existing `Comment` and `ActivityLog` infrastructure for lesson discussions.
+
+### Rejected / Alternative
+Creating a completely parallel `LessonDiscussion` and `DiscussionReply` database structure.
+
+### Why
+The existing `Comment` model (with a newly added nullable `lessonId`) already supports secure author attribution, timestamping, course-level scoping, and frontend feeds. Reusing it eliminates redundant infrastructure and unifies course engagement data.

@@ -7,6 +7,7 @@ import CourseHeader from '../components/CourseDetailInstructor/CourseHeader';
 import LessonList from '../components/CourseDetailInstructor/LessonList';
 import BulkEnrollment from '../components/CourseDetailInstructor/BulkEnrollment';
 import ActivityLog from '../components/CourseDetailInstructor/ActivityLog';
+import QuizList from '../components/CourseDetailInstructor/QuizList';
 
 export default function CourseDetailInstructor() {
   const { id } = useParams();
@@ -78,6 +79,7 @@ export default function CourseDetailInstructor() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <LessonList courseId={course.id} />
+          <QuizList courseId={course.id} />
           <BulkEnrollment courseId={course.id} />
         </div>
 
