@@ -154,13 +154,13 @@ export default function LessonList({ courseId }) {
                 <div key={lesson.id} className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
                   <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
                     <div className="flex items-center gap-3 flex-1">
-                      <span className="text-gray-400 font-mono text-sm w-6">{index + 1}.</span>
+                      <span className="text-gray-500 font-mono text-sm w-6">{index + 1}.</span>
                       <button
                         onClick={() => setExpandedId(isExpanded ? null : lesson.id)}
                         className="font-medium text-gray-900 flex-1 text-left flex items-center gap-2 hover:text-indigo-600"
                       >
                         {lesson.title}
-                        {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
                       </button>
                     </div>
 
@@ -168,7 +168,7 @@ export default function LessonList({ courseId }) {
                       <button
                         onClick={() => handleReorder(lesson.id, lesson.position, 'up')}
                         disabled={isFirst || actionLoading}
-                        className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-400"
+                        className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-500"
                         title="Move Up"
                       >
                         <ArrowUp className="w-4 h-4" />
@@ -176,7 +176,7 @@ export default function LessonList({ courseId }) {
                       <button
                         onClick={() => handleReorder(lesson.id, lesson.position, 'down')}
                         disabled={isLast || actionLoading}
-                        className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-400"
+                        className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-500"
                         title="Move Down"
                       >
                         <ArrowDown className="w-4 h-4" />
@@ -185,7 +185,7 @@ export default function LessonList({ courseId }) {
                       <button
                         onClick={() => startEdit(lesson)}
                         disabled={actionLoading}
-                        className="p-1 text-gray-400 hover:text-indigo-600"
+                        className="p-1 text-gray-500 hover:text-indigo-600"
                         title="Edit"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -193,7 +193,7 @@ export default function LessonList({ courseId }) {
                       <button
                         onClick={() => handleDeleteClick(lesson)}
                         disabled={actionLoading}
-                        className="p-1 text-gray-400 hover:text-red-600"
+                        className="p-1 text-gray-500 hover:text-red-600"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4" />

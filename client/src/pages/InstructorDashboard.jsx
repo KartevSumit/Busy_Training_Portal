@@ -44,7 +44,7 @@ export default function InstructorDashboard() {
           <div className="flex">
             <AlertTriangle className="h-5 w-5 text-red-400" />
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error loading dashboard</h3>
+              <h2 className="text-sm font-medium text-red-800">Error loading dashboard</h2>
               <div className="mt-2 text-sm text-red-700">{error}</div>
               <button onClick={fetchDashboard} className="mt-3 text-sm font-medium text-red-800 hover:text-red-900 underline">
                 Retry
@@ -142,7 +142,7 @@ export default function InstructorDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden flex flex-col">
           <div className="px-6 py-5 border-b border-gray-200">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">8-Week Completion Trend</h3>
+            <h2 className="text-lg font-medium leading-6 text-gray-900">8-Week Completion Trend</h2>
           </div>
           <div className="p-6 flex-1 min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -161,7 +161,7 @@ export default function InstructorDashboard() {
 
         <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-200">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">Course Progress Breakdown</h3>
+            <h2 className="text-lg font-medium leading-6 text-gray-900">Course Progress Breakdown</h2>
           </div>
           <div className="overflow-x-auto">
             {courseProgress.length === 0 ? (

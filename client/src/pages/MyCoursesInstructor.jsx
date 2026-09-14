@@ -139,7 +139,7 @@ export default function MyCoursesInstructor() {
         <div className="bg-red-50 p-4 rounded-md">
           <div className="flex">
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error loading courses</h3>
+              <h2 className="text-sm font-medium text-red-800">Error loading courses</h2>
               <div className="mt-2 text-sm text-red-700">{error}</div>
               <button 
                 onClick={() => fetchMyCourses(page, sort)}
@@ -158,7 +158,7 @@ export default function MyCoursesInstructor() {
         </div>
       ) : courses.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No courses yet</h3>
+          <h2 className="mt-2 text-sm font-medium text-gray-900">No courses yet</h2>
           <p className="mt-1 text-sm text-gray-500">Get started by creating your first course.</p>
           <div className="mt-6">
             <button

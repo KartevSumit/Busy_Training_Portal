@@ -29,7 +29,7 @@ export default function CatalogFilters({
 
       <div className="flex-1 relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
+          <Search className="h-5 w-5 text-gray-500" />
         </div>
         <input
           type="text"
@@ -47,7 +47,7 @@ export default function CatalogFilters({
               handleClearSearch();
               setTimeout(() => onSearchSubmit(), 0);
             }}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
           >
             &times;
           </button>
@@ -65,7 +65,7 @@ export default function CatalogFilters({
       </div>
 
       <div className="sm:w-48">
-        <select
+        <select aria-label="Category"
           name="category"
           value={filters.category}
           onChange={(e) => {
@@ -84,7 +84,7 @@ export default function CatalogFilters({
       {role === 'INSTRUCTOR' && (
         <>
           <div className="sm:w-40">
-            <select
+            <select aria-label="Status"
               name="status"
               value={filters.status}
               onChange={(e) => {
@@ -101,7 +101,7 @@ export default function CatalogFilters({
           </div>
 
           <div className="sm:w-48">
-            <select
+            <select aria-label="Instructor"
               name="instructor"
               value={filters.instructor || ''}
               onChange={(e) => {
@@ -120,7 +120,7 @@ export default function CatalogFilters({
       )}
 
       <div className="sm:w-48">
-        <select
+        <select aria-label="Sort"
           name="sort"
           value={filters.sort}
           onChange={(e) => {

@@ -185,7 +185,7 @@ export default function CourseDetailLearner() {
             </div>
             
             <div className="prose max-w-none text-gray-600">
-              {course.description ? <p>{course.description}</p> : <p className="italic text-gray-400">No description provided.</p>}
+              {course.description ? <p>{course.description}</p> : <p className="italic text-gray-500">No description provided.</p>}
             </div>
           
           {!enrollment && course.status !== 'PUBLISHED' && (
@@ -226,7 +226,7 @@ export default function CourseDetailLearner() {
                       {lesson.isCompleted ? (
                         <CheckCircle className="h-6 w-6 text-green-500" />
                       ) : (
-                        <div className="h-6 w-6 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs font-bold text-gray-400">
+                        <div className="h-6 w-6 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs font-bold text-gray-500">
                           {index + 1}
                         </div>
                       )}

@@ -63,7 +63,7 @@ export default function MyCoursesLearner() {
         <div className="bg-red-50 p-4 rounded-md">
           <div className="flex">
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error loading enrollments</h3>
+              <h2 className="text-sm font-medium text-red-800">Error loading enrollments</h2>
               <div className="mt-2 text-sm text-red-700">{error}</div>
               <button 
                 onClick={() => fetchEnrollments()}
@@ -82,7 +82,7 @@ export default function MyCoursesLearner() {
         </div>
       ) : enrollments.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <h3 className="mt-2 text-sm font-medium text-gray-900">You're not enrolled in any courses yet.</h3>
+          <h2 className="mt-2 text-sm font-medium text-gray-900">You're not enrolled in any courses yet.</h2>
           <p className="mt-1 text-sm text-gray-500">Find a course that interests you and start learning.</p>
           <div className="mt-6">
             <Link
@@ -119,7 +119,7 @@ export default function MyCoursesLearner() {
                   
                   <div className="mt-auto pt-4 border-t border-gray-100">
                     <div className="flex items-center text-sm text-gray-500">
-                      <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                      <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-500" />
                       <span>Enrolled on {new Date(enrollment.enrolledAt).toLocaleDateString()}</span>
                     </div>
                   </div>

@@ -67,17 +67,17 @@ export default function CourseCard({ course, role, userId, onEnrollSuccess }) {
           )}
         </div>
         
-        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{course.title}</h3>
+        <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{course.title}</h2>
         <p className="text-gray-500 text-sm mb-4 flex-1 line-clamp-3">{course.description || 'No description provided.'}</p>
         
         <div className="mt-auto space-y-2 pt-4 border-t border-gray-100">
           <div className="flex items-center text-sm text-gray-500">
-            <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+            <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-500" />
             <span>Created {new Date(course.createdAt).toLocaleDateString()}</span>
           </div>
           {(role === 'INSTRUCTOR' || course.enrollmentCount > 0) && (
             <div className="flex items-center text-sm text-gray-500">
-              <Users className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+              <Users className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-500" />
               <span>{course.enrollmentCount} learner{course.enrollmentCount !== 1 ? 's' : ''}</span>
             </div>
           )}

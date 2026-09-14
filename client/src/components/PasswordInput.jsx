@@ -24,7 +24,7 @@ export default function PasswordInput({ id, name, value, onChange, placeholder, 
       <button
         type="button"
         onClick={toggleVisibility}
-        className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+        className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
         title={showPassword ? 'Hide password' : 'Show password'}
         aria-label={showPassword ? 'Hide password' : 'Show password'}
       >

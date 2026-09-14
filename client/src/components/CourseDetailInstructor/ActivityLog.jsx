@@ -83,7 +83,7 @@ export default function ActivityLog({ courseId }) {
               <div className="text-sm text-gray-700 mt-1">
                 {renderActionText(act)}
               </div>
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-gray-500 mt-1">
                 {new Date(act.createdAt).toLocaleString()}
               </div>
             </div>

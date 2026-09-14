@@ -92,7 +92,7 @@ export default function QuizList({ courseId }) {
       <ConfirmationModal isOpen={!!questionToDelete} title="Delete Question" message="Are you sure?" onConfirm={handleDeleteQuestion} onCancel={() => setQuestionToDelete(null)} isDestructive />
 
       <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-        <h3 className="text-lg font-medium text-gray-900">Quizzes</h3>
+        <h2 className="text-lg font-medium text-gray-900">Quizzes</h2>
         <button onClick={() => setIsAdding(!isAdding)} className="px-3 py-1.5 bg-indigo-600 text-white rounded text-sm font-medium hover:bg-indigo-700">Add Quiz</button>
       </div>
 
@@ -117,7 +117,7 @@ export default function QuizList({ courseId }) {
             {expandedQuizId === q.id && quizData && (
               <div className="bg-gray-50 p-6 border-t border-gray-200 pl-12">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-medium text-gray-900">Questions ({quizData.questions?.length || 0})</h4>
+                  <h3 className="font-medium text-gray-900">Questions ({quizData.questions?.length || 0})</h3>
                   <button onClick={() => setIsAddingQuestion(!isAddingQuestion)} className="text-sm text-indigo-600">Add Question</button>
                 </div>
 
