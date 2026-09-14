@@ -1,4 +1,4 @@
-# AI-Assisted Development Log
+# AI-Prompts
 
 This file records the significant prompts used while building the Course Delivery & Enrollment take-home assignment.
 
